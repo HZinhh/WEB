@@ -80,6 +80,7 @@ img.logo {
 
 .userDetail {
     position: relative;
+    z-index:50;
     display: inline-block;
 }
 

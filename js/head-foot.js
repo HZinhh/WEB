@@ -264,11 +264,110 @@ else {
     document.getElementById("user-login").innerHTML = userLogin;
     document.querySelector(".userDetail").innerHTML += `    
     <div onmouseenter="enter('userDrop')" onmouseleave="leave('userDrop')" id="userDrop" class="dropdown-content">
+        <a href="#" id="form-info" onclick="infoUser()">Thông tin cá nhân</a>
         <a href="./order.html">Đơn hàng đã đặt</a>
         <a href="./index.html" onclick="logOut()">Đăng xuất</a>
     </div>
     `
 }
+
+function infoUser() {
+    const modalHTML = `
+    <div class="blur-bg-info" id="formInfoModal">
+        <div class="form_container_info">
+            <i class="fa fa-times form_close_info"></i>
+            <div class="form-inner">
+                <h2>Thông tin cá nhân</h2>
+                <div class="info_box">
+                    <label>Tên đăng nhập</label>
+                    <input type="text" id="info_username" readonly>
+                </div>
+                <div class="info_box">
+                    <label>Email</label>
+                    <input type="email" id="info_email" readonly>
+                </div>
+               <div class="info_box">
+                    <label>Mật khẩu</label>
+                    <div class="password-box">
+                        <input type="password" id="info_password" readonly>
+                        <i class="fa-regular fa-eye-slash" id="toggleInfoPw"></i>
+                    </div>
+                </div>
+                <div class="info_box">
+                    <label>Ngày đăng ký</label>
+                    <input type="text" id="info_ngaydangky" readonly>
+                </div>
+                <button class="buttonSubmit" id="editInfoBtn">Sửa thông tin</button>
+            </div>
+        </div>
+    </div>`;
+
+    document.getElementById("loginModal").insertAdjacentHTML('beforeend', modalHTML);
+
+    const formInfoModal = document.querySelector("#formInfoModal");
+    const formInfoClose = document.querySelector(".form_close_info");
+    const editBtn = document.getElementById("editInfoBtn");
+
+    // Hiển thị modal
+    formInfoModal.classList.add("show-popup");
+
+    // Lấy thông tin người dùng từ localStorage
+    let userLogin = JSON.parse(localStorage.getItem("userLogin")) || "";
+    let users = JSON.parse(localStorage.getItem("userDatabase")) || [];
+    let currentUser = users.find(u => u.username === userLogin);
+
+    const usernameInput = document.getElementById("info_username");
+    const passwordInput = document.getElementById("info_password");
+    const toggleInfoPw = document.getElementById("toggleInfoPw");
+
+    if (currentUser) {
+        usernameInput.value = currentUser.username;
+        document.getElementById("info_email").value = currentUser.email;
+        passwordInput.value = currentUser.password;
+        document.getElementById("info_ngaydangky").value = currentUser.ngaydangky;
+    }
+
+    // Show/Hide mật khẩu
+    toggleInfoPw.addEventListener("click", () => {
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            toggleInfoPw.classList.replace("fa-eye-slash", "fa-eye");
+        } else {
+            passwordInput.type = "password";
+            toggleInfoPw.classList.replace("fa-eye", "fa-eye-slash");
+        }
+    });
+
+    // Đóng form khi nhấn 
+    formInfoClose.addEventListener("click", () => {
+        formInfoModal.remove();
+    });
+
+    // Khi nhấn nút Sửa thông tin
+    editBtn.addEventListener("click", () => {
+        if (editBtn.innerText === "Sửa thông tin") {
+            // Cho phép chỉnh sửa
+            usernameInput.removeAttribute("readonly");
+            passwordInput.removeAttribute("readonly");
+            editBtn.innerText = "Lưu thay đổi";
+        } else {
+            // Lưu thay đổi
+            currentUser.username = usernameInput.value;
+            currentUser.password = passwordInput.value;
+            localStorage.setItem("userDatabase", JSON.stringify(users));
+            localStorage.setItem("userLogin", JSON.stringify(currentUser.username));
+            document.getElementById("user-login").innerText = currentUser.username;
+            alert("Cập nhật thông tin thành công!");
+            // Đặt lại readonly
+            usernameInput.setAttribute("readonly", true);
+            passwordInput.setAttribute("readonly", true);
+            editBtn.innerText = "Sửa thông tin";
+        }
+    });
+}
+
+
+
 
 function logOut() {
     localStorage.removeItem("userLogin");
