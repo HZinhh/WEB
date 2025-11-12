@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Giỏ hàng của bạn</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital@1&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/page.css" />
+    <link rel="stylesheet" href="./css/main.css" />
+    <link rel="stylesheet" href="./css/cart.css" />
+    <link rel="shortcut icon" href="./img/logo1.png" type="image/x-icon" />
+
+    <!-- FONT AWESOME -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+      integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="./css/login.css" />
+  </head>
+  <body>
+    <header class="mx-0 py-2"></header>
+    <div class="row text-center nav-bar m-0 sticky-top" id="nav-bar"></div>
+
+    <div class="container my-5 text-center" id="cart-empty">
+      <h2 class="font-weight-bold" id="cart-empty-message"></h2>
+      <img
+        src="https://www.aachifoods.com/templates/default-new/images/empty-cart.png"
+        style="width: 25%"
+      />
+    </div>
+
+    <div class="container my-5 text-center" id="cart-list">
+      <h2>Giỏ hàng</h2>
+      <table
+        class="text-center table table-bordered"
+        style="vertical-align: middle"
+      >
+        <thead style="font-size: 20px; vertical-align: middle">
+          <tr class="table-danger">
+            <th width="3%">
+              <input
+                type="checkbox"
+                id="check-all"
+                class="check"
+                onclick="checkAllChanged()"
+              />
+            </th>
+            <th width="20%">Hình ảnh</th>
+            <th width="45%">Tên sản phẩm</th>
+            <th width="10%">Số lượng</th>
+            <th width="15%">Giá</th>
+            <th width="7%"></th>
+          </tr>
+        </thead>
+        <tbody id="cart-body"></tbody>
+      </table>
+
+      <div id="cart-action">
+        <button class="btn btn-success" onclick="validateAndShowModal()">
+          Đặt hàng
+        </button>
+        <a href="./order.html" role="button" class="btn btn-warning"
+          >Xem lịch sử đặt hàng</a
+        >
+        <button class="btn btn-danger" onclick="deleteAllCart()">
+          Xóa giỏ hàng
+        </button>
+      </div>
+    </div>
+
+    <div class="alert alert-danger py-1" role="alert"></div>
+    <div class="alert alert-success py-1" role="alert"></div>
+    <div
+      class="modal fade"
+      id="paymentModal"
+      tabindex="-1"
+      aria-labelledby="paymentModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="paymentModalLabel">
+              Chọn phương thức thanh toán
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p>Vui lòng chọn hình thức thanh toán:</p>
+
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="paymentMethod"
+                id="payCash"
+                value="tiền mặt"
+                checked
+              />
+              <label class="form-check-label" for="payCash">
+                <i class="fa-solid fa-money-bill-wave"></i> Thanh toán bằng tiền
+                mặt (Khi nhận hàng)
+              </label>
+            </div>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="paymentMethod"
+                id="payBank"
+                value="chuyển khoản"
+              />
+              <label class="form-check-label" for="payBank">
+                <i class="fa-solid fa-credit-card"></i> Chuyển khoản ngân hàng
+              </label>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Hủy
+            </button>
+            <button
+              type="button"
+              class="btn btn-success"
+              onclick="confirmOrder()"
+            >
+              Xác nhận đặt hàng
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="modal fade"
+      id="qrCodeModal"
+      tabindex="-1"
+      aria-labelledby="qrCodeModalLabel"
+      aria-hidden="true"
+      data-bs-backdrop="static"
+      data-bs-keyboard="false"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="qrCodeModalLabel">
+              Quét mã để thanh toán
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              onclick="cancelBankTransfer()"
+              aria-label="Close"
+            ></button>
+          </div>
+
+          <div class="modal-body text-center">
+            <p>Vui lòng chuyển khoản chính xác số tiền dưới đây:</p>
+            <h3 class="text-danger fw-bold" id="qrTotalAmount">0đ</h3>
+            <img
+              src="./img/QR.jpg"
+              alt="Mã QR thanh toán của shop"
+              class="img-fluid my-3"
+              style="border: 1px solid #ccc; max-width: 250px"
+            />
+            <p class="fw-bold">
+              Nội dung chuyển khoản (gợi ý):<br />
+              <span class="text-primary" id="paymentContentSuggestion"></span>
+            </p>
+            <hr />
+            <div class="mb-3 text-start">
+              <label for="paymentProofInput" class="form-label"
+                >Tải lên ảnh chụp màn hình đã thanh toán:</label
+              >
+              <input
+                class="form-control"
+                type="file"
+                id="paymentProofInput"
+                accept="image/*"
+              />
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="cancelBankTransfer()"
+            >
+              Quay lại
+            </button>
+
+            <button
+              type="button"
+              class="btn btn-success"
+              onclick="confirmBankTransfer()"
+            >
+              Tôi đã thanh toán
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <footer></footer>
+    <div id="loginModal"></div>
+  </body>
+
+  <script
+    src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+    integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+    crossorigin="anonymous"
+  ></script>
+
+  <script src="./admin/js/accounts.js"></script>
+  <script src="./js/head-foot.js"></script>
+  <script src="./admin/js/products.js"></script>
+  <script src="./admin/js/orders.js"></script>
+  <script src="./js/database.js"></script>
+  <script src="./js/cart.js"></script>
+  <script src="./js/cartPage.js"></script>
+</html>
