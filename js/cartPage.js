@@ -176,26 +176,21 @@ function validateAndShowModal() {
  * - Nếu là "chuyển khoản" -> Mở Modal QR.
  */
 function confirmOrder() {
-  // 1. Lấy phương thức thanh toán
   const paymentElement = document.querySelector(
     'input[name="paymentMethod"]:checked'
   );
   const paymentMethod = paymentElement.value;
 
   if (paymentMethod === "tiền mặt") {
-    // --- XỬ LÝ CHO "TIỀN MẶT" (Lưu đơn hàng ngay) ---
     let order = [];
     let total = getTotal();
-    const length = userCart.length; // Lấy độ dài mảng
+    const length = userCart.length;
 
     for (let i = 0; i < length; ++i) {
       if (userCart[i].checked) {
-        // Xóa các thuộc tính không cần thiết
         delete userCart[i].username;
         delete userCart[i].checked;
         order.push(userCart[i]);
-
-        // Xóa khỏi cartList gốc
         let index = cartList.findIndex(
           (cart) => cart.id === userCart[i].id && cart.username === userLogin
         );
@@ -203,7 +198,7 @@ function confirmOrder() {
       }
     }
 
-    // Gọi hàm lưu đơn hàng với phương thức "tiền mặt"
+    // ✅ Lưu đơn hàng
     themDonHang(
       new Date().toLocaleString("fr-FR"),
       userLogin,
@@ -212,24 +207,33 @@ function confirmOrder() {
       "tiền mặt"
     );
 
+    // ✅ Lưu thông tin tạm để trang timeline hiển thị
+    const currentOrder = {
+      id: Date.now(),
+      user: userLogin,
+      total: getGia(total),
+      payment:
+        paymentMethod === "tiền mặt"
+          ? "Thanh toán tiền mặt"
+          : "Chuyển khoản ngân hàng",
+      status: "Chờ Xác Nhận", // ✅ Trạng thái đầu tiên sau khi đặt hàng
+      time: new Date().toLocaleString("vi-VN"),
+    };
+    localStorage.setItem("currentOrder", JSON.stringify(currentOrder));
+
     $("#paymentModal").modal("hide");
     successMessage("Đặt hàng thành công", 1500);
-    localStorage.setItem("cartList", JSON.stringify(cartList));
-    setTimeout(() => location.reload(), 1500);
+
+    // ✅ Chuyển sang trang TimeLineOrder.html sau 1.5 giây
+    setTimeout(() => {
+      window.location.href = "TimeLineOrder.html";
+    }, 1500);
   } else {
-    // --- XỬ LÝ CHO "CHUYỂN KHOẢN" (Mở Modal QR) ---
     let total = getTotal();
-
-    // 1. Cập nhật tổng số tiền vào modal QR
     document.getElementById("qrTotalAmount").innerText = getGia(total);
-
-    // 2. Cập nhật nội dung chuyển khoản gợi ý
-    // (Giả sử bạn có 1 thẻ <span id="paymentContentSuggestion"> trong qrCodeModal)
     document.getElementById(
       "paymentContentSuggestion"
     ).innerText = `TT Mua Hang ${userLogin}`;
-
-    // 3. Ẩn modal chọn thanh toán, và hiện modal QR
     $("#paymentModal").modal("hide");
     $("#qrCodeModal").modal("show");
   }
@@ -240,19 +244,14 @@ function confirmOrder() {
  * Sẽ được gọi khi nhấn nút "Tôi đã thanh toán" trên Modal QR.
  */
 function confirmBankTransfer() {
-  // (Nâng cao) Kiểm tra xem người dùng đã tải ảnh lên chưa
   const proofInput = document.getElementById("paymentProofInput");
   if (proofInput.files.length === 0) {
     dangerMessage("Vui lòng tải lên ảnh chụp màn hình đã thanh toán");
     return;
   }
 
-  // (Bạn có thể thêm logic xử lý ảnh (upload ảnh) ở đây nếu cần)
-  // ...
-
-  // --- Logic lưu đơn hàng (giống hệt phần "tiền mặt") ---
   let order = [];
-  let total = getTotal(); // Lấy lại tổng tiền
+  let total = getTotal();
   for (let i = 0; i < userCart.length; ++i) {
     if (userCart[i].checked) {
       delete userCart[i].username;
@@ -265,7 +264,6 @@ function confirmBankTransfer() {
     }
   }
 
-  // Lưu đơn hàng với trạng thái "chuyển khoản"
   themDonHang(
     new Date().toLocaleString("fr-FR"),
     userLogin,
@@ -274,11 +272,29 @@ function confirmBankTransfer() {
     "chuyển khoản"
   );
 
+  // ✅ Lưu thông tin tạm để trang timeline hiển thị
+  const currentOrder = {
+    id: Date.now(),
+    user: userLogin,
+    total: getGia(total),
+    payment:
+      paymentMethod === "tiền mặt"
+        ? "Thanh toán tiền mặt"
+        : "Chuyển khoản ngân hàng",
+    status: "Chờ Xác Nhận", // ✅ Trạng thái đầu tiên sau khi đặt hàng
+    time: new Date().toLocaleString("vi-VN"),
+  };
+  localStorage.setItem("currentOrder", JSON.stringify(currentOrder));
+
   $("#qrCodeModal").modal("hide");
-  successMessage("Đặt hàng thành công, đang chờ xác nhận thanh toán", 2500); // Tăng thời gian chờ
-  localStorage.setItem("cartList", JSON.stringify(cartList));
-  setTimeout(() => location.reload(), 2500);
+  successMessage("Đặt hàng thành công, đang chờ xác nhận", 2000);
+
+  // ✅ Chuyển sang trang TimeLineOrder.html sau 2 giây
+  setTimeout(() => {
+    window.location.href = "TimeLineOrder.html";
+  }, 2000);
 }
+
 /**
  * HÀM MỚI: XỬ LÝ KHI NGƯỜI DÙNG HỦY CHUYỂN KHOẢN
  * Được gọi bởi nút "X" hoặc nút "Quay lại" trên Modal QR
