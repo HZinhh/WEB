@@ -1,0 +1,106 @@
+/* Style cho Timeline */
+.timeline-container {
+  display: flex; /* Quan trọng: Đặt các bước nằm ngang */
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 20px 0;
+  overflow-x: auto; /* Cho phép cuộn ngang trên màn hình nhỏ */
+}
+
+.timeline-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 150px; /* Đặt chiều rộng cố định cho mỗi bước */
+  flex-shrink: 0; /* Ngăn các bước bị co lại */
+  position: relative;
+}
+
+.timeline-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #e0e0e0; /* Màu xám mặc định */
+  border: 2px solid #e0e0e0;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  transition: all 0.3s ease;
+}
+
+.timeline-label {
+  margin-top: 10px;
+  font-weight: 600;
+  color: #9e9e9e; /* Màu chữ xám mặc định */
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.timeline-time {
+  font-size: 12px;
+  color: #757575;
+}
+
+/* Thanh nối (line) giữa các bước */
+.timeline-connector {
+  flex-grow: 1; /* Quan trọng: Lấp đầy khoảng trống giữa các bước */
+  height: 4px;
+  background-color: #e0e0e0; /* Màu xám mặc định */
+  margin-top: 24px; /* Căn chỉnh với tâm của icon */
+  min-width: 50px; /* Độ rộng tối thiểu của thanh nối */
+  transition: all 0.3s ease;
+}
+
+/* --- TRẠNG THÁI --- */
+
+/* Trạng thái 'Hoàn thành' (completed) - Đã qua bước này */
+.timeline-step.completed .timeline-icon {
+  background-color: #28a745; /* Màu xanh lá */
+  border-color: #28a745;
+}
+
+.timeline-step.completed .timeline-label {
+  color: #212529; /* Màu chữ đen */
+}
+
+/* Tô màu thanh nối NẰM SAU bước 'completed' */
+.timeline-step.completed + .timeline-connector {
+  background-color: #28a745; /* Màu xanh lá */
+}
+
+/* Trạng thái 'Đang hoạt động' (active) - Bước hiện tại */
+.timeline-step.active .timeline-icon {
+  background-color: #28a745;
+  border-color: #28a745;
+  box-shadow: 0 0 10px rgba(40, 167, 69, 0.5); /* Hiệu ứng phát sáng */
+}
+
+.timeline-step.active .timeline-label {
+  color: #28a745; /* Màu xanh lá */
+  font-weight: 700;
+}
+
+/* CSS cho phần chi tiết sản phẩm */
+.order-product-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+.order-product-item img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-right: 15px;
+}
+.order-product-info {
+  flex-grow: 1;
+}
+.order-product-price {
+  font-weight: 600;
+  color: #d0021b;
+}
