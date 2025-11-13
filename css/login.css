@@ -226,16 +226,51 @@
   background: rgba(0,0,0,0.4);
   justify-content: center; align-items: center;
   z-index: 9999;
+  backdrop-filter: blur(3px);
 }
 .blur-bg-info.show-popup {
   display: flex;
 }
 .form_container_info {
-  background: white;
-  border-radius: 10px;
-  padding: 20px;
-  width: 400px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  position: relative;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 30px 35px;
+  width: 420px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  animation: popup 0.3s ease;
+
+}
+
+.form_container_info h2 {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 25px;
+}
+
+.form_close_info {
+  position: absolute;
+  top: 12px;
+  right: 15px;
+  font-size: 20px;
+  color: #555;
+  cursor: pointer;
+  background: #f1f1f1;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+.form_close_info:hover {
+  background: #ff4d4d;
+  color: white;
+  transform: rotate(90deg);
 }
 
 .info_box {
@@ -247,17 +282,34 @@
 
 .info_box label {
     width: 120px; /* Chiều rộng cố định cho label */
+    font-weight: 500;
+    color: #444;
+
 }
 
-.info_box input, 
-.password-box {
-    flex: 1; /* input và password-box chiếm phần còn lại */
+.info_box input{
+  flex: 1;
+  padding: 8px 10px;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+  transition: all 0.3s ease;
+  background-color: #f9f9f9;
+
 }
+
+.info_box input:focus {
+  border-color: #4CAF50;
+  background-color: #fff;
+  box-shadow: 0 0 6px rgba(76, 175, 80, 0.3);
+}
+
 
 .password-box {
     position: relative;
     display: flex;
     align-items: center;
+    flex: 1;
 }
 
 .password-box input {
@@ -270,19 +322,29 @@
     position: absolute;
     right: 10px;
     cursor: pointer;
-    color: #555;
+    color: #777;
+    transition: color 0.3s;
+
 }
 
+.password-box i:hover {
+  color: #4CAF50;
+}
+
+
 .buttonSubmit {
-    background-color: #4CAF50; /* xanh tươi */
-    color: white; /* chữ màu trắng */
-    padding: 6px 6px; /* padding đều 2 chiều */
-    border: none; /* bỏ viền mặc định */
-    border-radius: 8px; /* bo tròn góc */
-    font-size: 16px; /* chữ vừa phải */
-    cursor: pointer; /* đổi con trỏ khi hover */
-    transition: all 0.3s ease; /* hiệu ứng mượt khi hover */
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* bóng nhẹ */
+  display: block;
+  width: 100%;
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .buttonSubmit:hover {
