@@ -39,7 +39,6 @@ window.onload = function () {
     });
 };
 
-// Hàm tiện ích
 function getProducts() {
   return JSON.parse(localStorage.getItem("productDatabase"));
 }
@@ -86,7 +85,7 @@ function loadTypeSelect() {
   });
 }
 
-// Hàm tính giá bán
+// Tính giá bán
 function calculateSalePrice(importPrice, profitPercent) {
   importPrice = Number(importPrice) || 0;
   profitPercent = Number(profitPercent) || 0;
@@ -97,23 +96,19 @@ function calculateSalePrice(importPrice, profitPercent) {
   return Math.round(salePrice / 1000) * 1000;
 }
 
-// Tải và hiển thị bảng giá
 function loadPriceList(search = "") {
   const products = getProducts();
   const priceDB = getPriceDB();
   const tbody = document.getElementById("price-list");
   tbody.innerHTML = "";
 
-  // Chuẩn bị từ khóa tìm kiếm (bỏ qua dấu chấm, đ, khoảng trắng)
   const searchTerm = search.toLowerCase();
   const searchNumber = searchTerm.replace(/\.|đ|\s|vnd/g, "");
 
   const filteredProducts = products.filter((p) => {
-    // 1. Lấy các giá trị văn bản
     const name = p.name.toLowerCase();
     const id = p.id.toLowerCase();
 
-    // 2. Tính toán các giá trị số để tra cứu
     const importPrice = p.importPrice || 0;
 
     let profitPercent = p.profitPercent;
@@ -123,11 +118,9 @@ function loadPriceList(search = "") {
 
     const salePrice = calculateSalePrice(importPrice, profitPercent);
 
-    // 3.Tra cứu
     if (name.includes(searchTerm)) return true;
     if (id.includes(searchTerm)) return true;
 
-    // 4. Tra cứu theo số (Giá vốn, %, Giá bán)
     if (String(importPrice).includes(searchNumber)) return true;
     if (String(profitPercent).includes(searchNumber)) return true;
     if (String(salePrice).includes(searchNumber)) return true;
@@ -193,7 +186,6 @@ function loadPriceList(search = "") {
   saveProducts(products);
 }
 
-// Hàm tìm kiếm
 function searchPrice() {
   const searchVal = document.getElementById("searchPrice").value;
   loadPriceList(searchVal);
@@ -260,7 +252,7 @@ function saveIndividualProfit(productId) {
   }
 }
 
-// Reset % lợi nhuận cá nhân, quay về % theo loại
+// Reset % lợi nhuận
 function resetIndividualProfit(productId) {
   const products = getProducts();
   const productIndex = products.findIndex((p) => p.id === productId);
@@ -274,7 +266,7 @@ function resetIndividualProfit(productId) {
 
     saveProducts(products);
     showAlert(
-      `Đã reset lợi nhuận cho ${productId}, quay về mặc định của loại.`,
+      `Đã reset lợi nhuận cho ${productId}, trở về mặc định của loại.`,
       true
     );
 

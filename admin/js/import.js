@@ -1,4 +1,3 @@
-// Khởi tạo khi tải trang
 window.onload = function () {
   if (!localStorage.getItem("productDatabase")) {
     console.error(
@@ -22,7 +21,6 @@ window.onload = function () {
     });
 };
 
-// Hàm tiện ích
 function getProductsFromStorage() {
   return JSON.parse(localStorage.getItem("productDatabase"));
 }
@@ -42,7 +40,6 @@ function formatCurrency(number) {
   }).format(number);
 }
 
-// Hiển thị alert
 function showAlert(message, isSuccess = true) {
   const alertClass = isSuccess ? ".alert-success" : ".alert-danger";
   const alertEl = document.querySelector(alertClass);
@@ -145,8 +142,6 @@ function searchImport() {
   loadImports(searchVal);
 }
 
-// HÀM HELPER ĐỂ RENDER LẠI TẤT CẢ CÁC DÒNG CHI TIẾT PHIẾU NHẬP
-
 function renderAllImportRows(details) {
   const products = getProductsFromStorage();
   let productOptions = "";
@@ -193,7 +188,7 @@ function renderAllImportRows(details) {
   }
 }
 
-// Mở Modal Thêm/Sửa phiếu nhập
+// Thêm/Sửa phiếu nhập
 function openImportForm(mode, importId = null) {
   const modalElement = document.getElementById("importModal");
   const products = getProductsFromStorage();
@@ -216,7 +211,6 @@ function openImportForm(mode, importId = null) {
     }
   }
 
-  // HTML của Modal
   modalElement.innerHTML = `
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -332,7 +326,6 @@ function handleSaveImport(mode, importId) {
     }
     imports.push(finalData);
   } else {
-    // Chế độ Sửa
     const index = imports.findIndex((imp) => imp.id === importId);
     if (index > -1) {
       imports[index] = finalData;
@@ -348,7 +341,6 @@ function handleSaveImport(mode, importId) {
   loadImports();
 }
 
-// Xử lý Hoàn thành phiếu nhập
 function handleCompleteImport(importId) {
   if (
     !confirm(
@@ -367,7 +359,7 @@ function handleCompleteImport(importId) {
     return;
   }
 
-  // Cập nhật tồn kho và giá nhập (giá vốn)
+  // Cập nhật tồn kho và giá vốn
   importData.details.forEach((d) => {
     const productIndex = products.findIndex((p) => p.id === d.productId);
     if (productIndex > -1) {
@@ -386,7 +378,7 @@ function handleCompleteImport(importId) {
   loadImports();
 }
 
-// Xử lý Xóa phiếu nhập
+// Xóa phiếu nhập
 function handleDeleteImport(importId) {
   const importData = getImportsFromStorage().find((imp) => imp.id === importId);
 
