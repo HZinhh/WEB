@@ -318,6 +318,8 @@ function infoUser() {
 
     const usernameInput = document.getElementById("info_username");
     const passwordInput = document.getElementById("info_password");
+    const emailInput = document.getElementById("info_email");
+    const ngaydangkyInput = document.getElementById("info_ngaydangky");
     const toggleInfoPw = document.getElementById("toggleInfoPw");
 
     if (currentUser) {
@@ -349,11 +351,15 @@ function infoUser() {
             // Cho phép chỉnh sửa
             usernameInput.removeAttribute("readonly");
             passwordInput.removeAttribute("readonly");
+            emailInput.removeAttribute("readonly");
+            ngaydangkyInput.removeAttribute("readonly");
             editBtn.innerText = "Lưu thay đổi";
         } else {
             // Lưu thay đổi
             currentUser.username = usernameInput.value;
             currentUser.password = passwordInput.value;
+            currentUser.email = emailInput.value;
+            currentUser.ngaydangky = ngaydangkyInput.value
             localStorage.setItem("userDatabase", JSON.stringify(users));
             localStorage.setItem("userLogin", JSON.stringify(currentUser.username));
             document.getElementById("user-login").innerText = currentUser.username;
@@ -361,6 +367,8 @@ function infoUser() {
             // Đặt lại readonly
             usernameInput.setAttribute("readonly", true);
             passwordInput.setAttribute("readonly", true);
+            emailInput.setAttribute("readonly", true);
+            ngaydangkyInput.setAttribute("readonly", true);
             editBtn.innerText = "Sửa thông tin";
         }
     });
