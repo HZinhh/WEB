@@ -112,25 +112,6 @@ function autoCheckAll() {
   document.getElementById("check-all").checked = true;
 }
 
-/**
- * HÀM 1: KIỂM TRA GIỎ HÀNG
- * (Logic được tách ra từ hàm makeOrder cũ)
- */
-
-// Kiểm tra xem có check món nào không
-
-/**
- * HÀM 2: HÀM MỚI CHO NÚT "ĐẶT HÀNG"
- * Sẽ được gọi bởi nút bạn vừa sửa ở Bước 1.
- */
-
-/**
- * HÀM 3: HÀM MỚI CHO NÚT "XÁC NHẬN" TRÊN MODAL
- * Xử lý đặt hàng sau khi đã chọn thanh toán
- */
-/**
- * HÀM 1: KIỂM TRA GIỎ HÀNG (Giữ nguyên)
- */
 function validateCart() {
   let warning = true;
   const length = userCart.length;
@@ -169,12 +150,6 @@ function validateAndShowModal() {
   }
 }
 
-/**
- * HÀM 3: HÀM "XÁC NHẬN" (ĐÃ SỬA ĐỔI)
- * Hàm này bây giờ sẽ kiểm tra phương thức thanh toán:
- * - Nếu là "tiền mặt" -> Lưu đơn hàng ngay.
- * - Nếu là "chuyển khoản" -> Mở Modal QR.
- */
 function confirmOrder() {
   const paymentElement = document.querySelector(
     'input[name="paymentMethod"]:checked'
@@ -184,13 +159,19 @@ function confirmOrder() {
   if (paymentMethod === "tiền mặt") {
     let order = [];
     let total = getTotal();
-    const length = userCart.length;
 
-    for (let i = 0; i < length; ++i) {
+    for (let i = 0; i < userCart.length; ++i) {
       if (userCart[i].checked) {
-        delete userCart[i].username;
-        delete userCart[i].checked;
-        order.push(userCart[i]);
+        // ❗ KHÔNG được xoá username, checked !!!
+        order.push({
+          id: userCart[i].id,
+          name: userCart[i].name,
+          price: userCart[i].price,
+          amount: userCart[i].amount,
+          img: userCart[i].img,
+        });
+
+        // ❗ Xoá trong cartList đúng thứ tự
         let index = cartList.findIndex(
           (cart) => cart.id === userCart[i].id && cart.username === userLogin
         );
@@ -198,25 +179,20 @@ function confirmOrder() {
       }
     }
 
-    // ✅ Lưu đơn hàng
-    themDonHang(
-      new Date().toLocaleString("fr-FR"),
-      userLogin,
-      order,
-      total,
-      "tiền mặt"
-    );
+    // ❗ Cập nhật giỏ hàng sau khi xoá
+    localStorage.setItem("cartList", JSON.stringify(cartList));
 
-    // ✅ Lưu thông tin tạm để trang timeline hiển thị
+    // ❗ Gọi đúng hàm themDonHang
+    themDonHang(new Date().toLocaleString("fr-FR"), userLogin, order, total);
+
+    // ❗ Lưu dữ liệu timeline
     const currentOrder = {
       id: Date.now(),
       user: userLogin,
-      total: getGia(total),
-      payment:
-        paymentMethod === "tiền mặt"
-          ? "Thanh toán tiền mặt"
-          : "Chuyển khoản ngân hàng",
-      status: "Chờ Xác Nhận", // ✅ Trạng thái đầu tiên sau khi đặt hàng
+      total: total,
+      payment: "Thanh toán tiền mặt",
+      status: "Chờ Xác Nhận",
+      firstStep: "Đơn Hàng Đã Đặt",
       time: new Date().toLocaleString("vi-VN"),
     };
     localStorage.setItem("currentOrder", JSON.stringify(currentOrder));
@@ -224,11 +200,11 @@ function confirmOrder() {
     $("#paymentModal").modal("hide");
     successMessage("Đặt hàng thành công", 1500);
 
-    // ✅ Chuyển sang trang TimeLineOrder.html sau 1.5 giây
     setTimeout(() => {
       window.location.href = "TimeLineOrder.html";
     }, 1500);
   } else {
+    // phần chuyển khoản giữ nguyên
     let total = getTotal();
     document.getElementById("qrTotalAmount").innerText = getGia(total);
     document.getElementById(
@@ -252,11 +228,19 @@ function confirmBankTransfer() {
 
   let order = [];
   let total = getTotal();
+
   for (let i = 0; i < userCart.length; ++i) {
     if (userCart[i].checked) {
-      delete userCart[i].username;
-      delete userCart[i].checked;
-      order.push(userCart[i]);
+      // đưa sp vào danh sách order
+      order.push({
+        id: userCart[i].id,
+        name: userCart[i].name,
+        price: userCart[i].price,
+        amount: userCart[i].amount,
+        img: userCart[i].img,
+      });
+
+      // xóa sản phẩm ra khỏi cartList
       let index = cartList.findIndex(
         (cart) => cart.id === userCart[i].id && cart.username === userLogin
       );
@@ -264,32 +248,28 @@ function confirmBankTransfer() {
     }
   }
 
-  themDonHang(
-    new Date().toLocaleString("fr-FR"),
-    userLogin,
-    order,
-    total,
-    "chuyển khoản"
-  );
+  // lưu lại giỏ hàng mới
+  localStorage.setItem("cartList", JSON.stringify(cartList));
 
-  // ✅ Lưu thông tin tạm để trang timeline hiển thị
+  // lưu đơn hàng vào database admin
+  themDonHang(new Date().toLocaleString("fr-FR"), userLogin, order, total);
+
+  // lưu thông tin order cho timeline
   const currentOrder = {
     id: Date.now(),
     user: userLogin,
-    total: getGia(total),
-    payment:
-      paymentMethod === "tiền mặt"
-        ? "Thanh toán tiền mặt"
-        : "Chuyển khoản ngân hàng",
-    status: "Chờ Xác Nhận", // ✅ Trạng thái đầu tiên sau khi đặt hàng
+    total: total,
+    payment: "Chuyển khoản",
+    status: "Chờ Xác Nhận",
+    firstStep: "Đơn Hàng Đã Đặt",
     time: new Date().toLocaleString("vi-VN"),
   };
+
   localStorage.setItem("currentOrder", JSON.stringify(currentOrder));
 
   $("#qrCodeModal").modal("hide");
   successMessage("Đặt hàng thành công, đang chờ xác nhận", 2000);
 
-  // ✅ Chuyển sang trang TimeLineOrder.html sau 2 giây
   setTimeout(() => {
     window.location.href = "TimeLineOrder.html";
   }, 2000);
