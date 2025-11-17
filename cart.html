@@ -30,7 +30,6 @@
     <link rel="stylesheet" href="./css/cart.css" />
     <link rel="shortcut icon" href="./img/logo1.png" type="image/x-icon" />
 
-    <!-- FONT AWESOME -->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
@@ -39,6 +38,8 @@
       referrerpolicy="no-referrer"
     />
     <link rel="stylesheet" href="./css/login.css" />
+
+    <link rel="stylesheet" href="./css/order-timeline.css" />
   </head>
   <body>
     <header class="mx-0 py-2"></header>
@@ -91,8 +92,212 @@
       </div>
     </div>
 
+    <div class="container my-5" id="order-timeline-view" style="display: none">
+      <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-body p-4 p-md-5">
+          <div
+            class="d-flex flex-wrap justify-content-between align-items-center mb-4"
+          >
+            <a
+              href="./order.html"
+              class="btn btn-outline-secondary btn-sm mb-2 mb-md-0"
+            >
+              <i class="fa-solid fa-arrow-left me-1"></i> TRỞ LẠI
+            </a>
+            <h4 class="mb-0 text-success fw-bold">CHI TIẾT ĐƠN HÀNG</h4>
+            <div class="fw-bold">
+              ID ĐƠN HÀNG:
+              <span class="text-danger" id="order-id-display">Đang tải...</span>
+            </div>
+          </div>
+
+          <div class="timeline-container">
+            <div class="timeline-step" data-status="Đơn Hàng Đã Đặt">
+              <div class="timeline-icon">
+                <i class="fa-solid fa-file-lines"></i>
+              </div>
+              <div class="timeline-label">Đơn Hàng Đã Đặt</div>
+              <div class="timeline-time"></div>
+            </div>
+
+            <div class="timeline-connector"></div>
+
+            <div class="timeline-step" data-status="Chờ Xác Nhận">
+              <div class="timeline-icon">
+                <i class="fa-solid fa-wallet"></i>
+              </div>
+              <div class="timeline-label">Chờ Xác Nhận</div>
+              <div class="timeline-time"></div>
+            </div>
+
+            <div class="timeline-connector"></div>
+
+            <div class="timeline-step" data-status="Đã Giao Cho ĐVVC">
+              <div class="timeline-icon">
+                <i class="fa-solid fa-truck-fast"></i>
+              </div>
+              <div class="timeline-label">Đã Giao Cho ĐVVC</div>
+              <div class="timeline-time"></div>
+            </div>
+
+            <div class="timeline-connector"></div>
+
+            <div class="timeline-step" data-status="Đang Giao">
+              <div class="timeline-icon">
+                <i class="fa-solid fa-box"></i>
+              </div>
+              <div class="timeline-label">Đang Giao</div>
+              <div class="timeline-time"></div>
+            </div>
+
+            <div class="timeline-connector"></div>
+
+            <div class="timeline-step" data-status="Đánh Giá">
+              <div class="timeline-icon">
+                <i class="fa-solid fa-star"></i>
+              </div>
+              <div class="timeline-label">Đánh Giá</div>
+              <div class="timeline-time"></div>
+            </div>
+          </div>
+          <hr class="my-4" />
+
+          <div class="row">
+            <div class="col-lg-5">
+              <h5 class="mb-3">Sản phẩm đã đặt</h5>
+              <div id="order-products-list"></div>
+            </div>
+            <div class="col-lg-3">
+              <h5 class="mb-3">Địa chỉ nhận hàng</h5>
+              <div
+                class="card bg-light border-0 rounded-3 p-3"
+                style="font-size: 0.9em"
+              >
+                <p class="mb-1 fw-bold" id="timeline-shipping-name">
+                  Đang tải...
+                </p>
+                <p class="mb-1" id="timeline-shipping-phone">Đang tải...</p>
+                <p class="mb-0" id="timeline-shipping-address">Đang tải...</p>
+              </div>
+            </div>
+            <div class="col-lg-4">
+              <h5 class="mb-3">Tóm tắt đơn hàng</h5>
+              <div class="card bg-light border-0 rounded-3 p-3">
+                <div
+                  class="d-flex justify-content-between mb-2"
+                  id="order-summary-total"
+                >
+                  <span>Tổng tiền hàng:</span>
+                  <span class="fw-bold">0đ</span>
+                </div>
+                <div
+                  class="d-flex justify-content-between mb-2"
+                  id="order-summary-shipping"
+                >
+                  <span>Phí vận chuyển:</span>
+                  <span class="fw-bold">0đ</span>
+                </div>
+                <hr />
+                <div
+                  class="d-flex justify-content-between text-danger fw-bold fs-5"
+                  id="order-summary-grand-total"
+                >
+                  <span>Tổng cộng:</span>
+                  <span>0đ</span>
+                </div>
+                <hr />
+                <div
+                  class="d-flex justify-content-between"
+                  id="order-summary-payment"
+                >
+                  <span>Trạng thái:</span>
+                  <span class="fw-bold">...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="alert alert-danger py-1" role="alert"></div>
     <div class="alert alert-success py-1" role="alert"></div>
+
+    <div
+      class="modal fade"
+      id="addressModal"
+      tabindex="-1"
+      aria-labelledby="addressModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addressModalLabel">
+              Thông tin nhận hàng
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="shipping-address-form">
+              <div class="mb-3">
+                <label for="shippingName" class="form-label"
+                  >Họ và tên người nhận</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="shippingName"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="shippingPhone" class="form-label"
+                  >Số điện thoại</label
+                >
+                <input
+                  type="tel"
+                  class="form-control"
+                  id="shippingPhone"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="shippingAddress" class="form-label"
+                  >Địa chỉ nhận hàng</label
+                >
+                <textarea
+                  class="form-control"
+                  id="shippingAddress"
+                  rows="3"
+                  required
+                ></textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Hủy
+            </button>
+            <button
+              type="button"
+              class="btn btn-success"
+              onclick="confirmAddressAndShowPayment()"
+            >
+              Tiếp tục
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
     <div
       class="modal fade"
       id="paymentModal"
@@ -254,4 +459,6 @@
   <script src="./js/database.js"></script>
   <script src="./js/cart.js"></script>
   <script src="./js/cartPage.js"></script>
+
+  <script src="./js/timeline-order.js"></script>
 </html>
