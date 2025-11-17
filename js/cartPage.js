@@ -1,3 +1,5 @@
+let tempShippingAddress = {}; // BIẾN QUAN TRỌNG ĐỂ LƯU ĐỊA CHỈ TẠM
+
 onload = () => {
   displayCart();
 };
@@ -142,36 +144,64 @@ function validateCart() {
 }
 
 /**
- * HÀM 2: HÀM CHO NÚT "ĐẶT HÀNG" (Giữ nguyên)
+ * HÀM 2: HÀM CHO NÚT "ĐẶT HÀNG" (ĐÃ SỬA)
+ * Mở modal ĐỊA CHỈ
  */
 function validateAndShowModal() {
   if (validateCart()) {
-    $("#paymentModal").modal("show");
+    $("#addressModal").modal("show"); // Mở modal ĐỊA CHỈ
   }
 }
 
+/**
+ * HÀM MỚI: XÁC NHẬN ĐỊA CHỈ VÀ MỞ MODAL THANH TOÁN
+ */
+function confirmAddressAndShowPayment() {
+  // 1. Lấy dữ liệu từ form địa chỉ
+  const name = document.getElementById("shippingName").value;
+  const phone = document.getElementById("shippingPhone").value;
+  const address = document.getElementById("shippingAddress").value;
+
+  // 2. Kiểm tra dữ liệu (đơn giản)
+  if (!name || !phone || !address) {
+    dangerMessage("Vui lòng điền đầy đủ thông tin nhận hàng.");
+    return;
+  }
+
+  // 3. Lưu vào biến tạm
+  tempShippingAddress = {
+    name: name,
+    phone: phone,
+    address: address,
+  };
+
+  // 4. Ẩn modal địa chỉ và hiện modal thanh toán
+  $("#addressModal").modal("hide");
+  $("#paymentModal").modal("show");
+}
+
+/**
+ * HÀM 3: HÀM "XÁC NHẬN" (ĐÃ SỬA ĐỔI)
+ */
 function confirmOrder() {
+  // 1. Lấy phương thức thanh toán
   const paymentElement = document.querySelector(
     'input[name="paymentMethod"]:checked'
   );
   const paymentMethod = paymentElement.value;
 
   if (paymentMethod === "tiền mặt") {
-    let order = [];
-    let total = getTotal();
+    // --- XỬ LÝ CHO "TIỀN MẶT" ---
+    let order = []; // Mảng sản phẩm MỚI
+    let total = getTotal(); // Tổng tiền MỚI
+    const length = userCart.length;
 
-    for (let i = 0; i < userCart.length; ++i) {
+    for (let i = 0; i < length; ++i) {
       if (userCart[i].checked) {
-        // ❗ KHÔNG được xoá username, checked !!!
-        order.push({
-          id: userCart[i].id,
-          name: userCart[i].name,
-          price: userCart[i].price,
-          amount: userCart[i].amount,
-          img: userCart[i].img,
-        });
+        delete userCart[i].username;
+        delete userCart[i].checked;
+        order.push(userCart[i]); // Thêm sản phẩm MỚI vào mảng
 
-        // ❗ Xoá trong cartList đúng thứ tự
         let index = cartList.findIndex(
           (cart) => cart.id === userCart[i].id && cart.username === userLogin
         );
@@ -179,32 +209,42 @@ function confirmOrder() {
       }
     }
 
-    // ❗ Cập nhật giỏ hàng sau khi xoá
+    const orderTime = new Date().toLocaleString("fr-FR");
+
+    // Gọi hàm lưu đơn hàng (giống cũ)
+    themDonHang(orderTime, userLogin, order, total, "tiền mặt");
+
+    // Dọn dẹp cartList
     localStorage.setItem("cartList", JSON.stringify(cartList));
 
-    // ❗ Gọi đúng hàm themDonHang
-    themDonHang(new Date().toLocaleString("fr-FR"), userLogin, order, total);
+    // ****** PHẦN SỬA LỖI (KHÔNG LẤY TỪ LOCALSTORAGE) ******
+    // Lấy ID đơn hàng cuối cùng (giả sử themDonHang đã cập nhật)
+    let currentOrderList = JSON.parse(localStorage.getItem("orderList")) || [];
+    let newOrderID =
+      currentOrderList.length > 0
+        ? currentOrderList[currentOrderList.length - 1].id
+        : "N/A";
 
-    // ❗ Lưu dữ liệu timeline
-    const currentOrder = {
-      id: Date.now(),
-      user: userLogin,
-      total: total,
-      payment: "Thanh toán tiền mặt",
+    // Tự xây dựng đối tượng order object với dữ liệu MỚI
+    let newOrderObject = {
+      id: newOrderID,
+      order: order, // <-- 'order' là mảng sản phẩm MỚI ta vừa tạo
+      total: total, // <-- 'total' là tổng tiền MỚI
+      payment: "tiền mặt",
       status: "Chờ Xác Nhận",
-      firstStep: "Đơn Hàng Đã Đặt",
-      time: new Date().toLocaleString("vi-VN"),
+      time: orderTime,
+      address: tempShippingAddress, // <-- 'address' là địa chỉ MỚI
     };
-    localStorage.setItem("currentOrder", JSON.stringify(currentOrder));
+    // ****** KẾT THÚC PHẦN SỬA LỖI ******
 
+    // Đóng modal và hiển thị thông báo
     $("#paymentModal").modal("hide");
     successMessage("Đặt hàng thành công", 1500);
 
-    setTimeout(() => {
-      window.location.href = "TimeLineOrder.html";
-    }, 1500);
+    // Gọi hàm timeline với object MỚI
+    loadTimelineData(newOrderObject);
   } else {
-    // phần chuyển khoản giữ nguyên
+    // --- XỬ LÝ CHO "CHUYỂN KHOẢN" (Mở Modal QR) ---
     let total = getTotal();
     document.getElementById("qrTotalAmount").innerText = getGia(total);
     document.getElementById(
@@ -216,8 +256,7 @@ function confirmOrder() {
 }
 
 /**
- * HÀM 4: HÀM MỚI - "TÔI ĐÃ THANH TOÁN"
- * Sẽ được gọi khi nhấn nút "Tôi đã thanh toán" trên Modal QR.
+ * HÀM 4: "TÔI ĐÃ THANH TOÁN" (ĐÃ SỬA ĐỔI)
  */
 function confirmBankTransfer() {
   const proofInput = document.getElementById("paymentProofInput");
@@ -226,21 +265,14 @@ function confirmBankTransfer() {
     return;
   }
 
-  let order = [];
-  let total = getTotal();
-
+  // --- Logic lưu đơn hàng ---
+  let order = []; // Mảng sản phẩm MỚI
+  let total = getTotal(); // Tổng tiền MỚI
   for (let i = 0; i < userCart.length; ++i) {
     if (userCart[i].checked) {
-      // đưa sp vào danh sách order
-      order.push({
-        id: userCart[i].id,
-        name: userCart[i].name,
-        price: userCart[i].price,
-        amount: userCart[i].amount,
-        img: userCart[i].img,
-      });
-
-      // xóa sản phẩm ra khỏi cartList
+      delete userCart[i].username;
+      delete userCart[i].checked;
+      order.push(userCart[i]); // Thêm sản phẩm MỚI vào mảng
       let index = cartList.findIndex(
         (cart) => cart.id === userCart[i].id && cart.username === userLogin
       );
@@ -248,44 +280,49 @@ function confirmBankTransfer() {
     }
   }
 
-  // lưu lại giỏ hàng mới
+  const orderTime = new Date().toLocaleString("fr-FR");
+
+  // Gọi hàm lưu đơn hàng (giống cũ)
+  themDonHang(orderTime, userLogin, order, total, "chuyển khoản");
+
+  // Dọn dẹp cartList
   localStorage.setItem("cartList", JSON.stringify(cartList));
 
-  // lưu đơn hàng vào database admin
-  themDonHang(new Date().toLocaleString("fr-FR"), userLogin, order, total);
+  // ****** PHẦN SỬA LỖI (KHÔNG LẤY TỪ LOCALSTORAGE) ******
+  let currentOrderList = JSON.parse(localStorage.getItem("orderList")) || [];
+  let newOrderID =
+    currentOrderList.length > 0
+      ? currentOrderList[currentOrderList.length - 1].id
+      : "N/A";
 
-  // lưu thông tin order cho timeline
-  const currentOrder = {
-    id: Date.now(),
-    user: userLogin,
-    total: total,
-    payment: "Chuyển khoản",
+  // Tự xây dựng đối tượng order object với dữ liệu MỚI
+  let newOrderObject = {
+    id: newOrderID,
+    order: order, // <-- 'order' là mảng sản phẩm MỚI ta vừa tạo
+    total: total, // <-- 'total' là tổng tiền MỚI
+    payment: "chuyển khoản",
     status: "Chờ Xác Nhận",
-    firstStep: "Đơn Hàng Đã Đặt",
-    time: new Date().toLocaleString("vi-VN"),
+    time: orderTime,
+    address: tempShippingAddress, // <-- 'address' là địa chỉ MỚI
   };
+  // ****** KẾT THÚC PHẦN SỬA LỖI ******
 
-  localStorage.setItem("currentOrder", JSON.stringify(currentOrder));
-
+  // Đóng modal và hiển thị thông báo
   $("#qrCodeModal").modal("hide");
-  successMessage("Đặt hàng thành công, đang chờ xác nhận", 2000);
+  successMessage("Đặt hàng thành công, đang chờ xác nhận thanh toán", 2500);
 
-  setTimeout(() => {
-    window.location.href = "TimeLineOrder.html";
-  }, 2000);
+  // Gọi hàm timeline với object MỚI
+  loadTimelineData(newOrderObject);
 }
 
 /**
- * HÀM MỚI: XỬ LÝ KHI NGƯỜI DÙNG HỦY CHUYỂN KHOẢN
- * Được gọi bởi nút "X" hoặc nút "Quay lại" trên Modal QR
+ * HÀM 5: HỦY CHUYỂN KHOẢN (Giữ nguyên)
  */
 function cancelBankTransfer() {
-  // 1. Ẩn modal QR đi
   $("#qrCodeModal").modal("hide");
-
-  // 2. Mở LẠI modal chọn phương thức thanh toán
   $("#paymentModal").modal("show");
 }
+
 function checkKey(input, event) {
   if (event.key === "Backspace" || event.key === "Enter") return;
   if (isNaN(event.key)) input.value = input.min;
