@@ -297,6 +297,11 @@ function infoUser() {
                     <label>Ngày đăng ký</label>
                     <input type="text" id="info_ngaydangky" readonly>
                 </div>
+                <div class="info_box">
+                    <label>Địa chỉ</label>
+                    <input type="text" id="info_diachi" readonly>
+                </div>
+
                 <button class="buttonSubmit" id="editInfoBtn">Sửa thông tin</button>
             </div>
         </div>
@@ -321,12 +326,16 @@ function infoUser() {
     const emailInput = document.getElementById("info_email");
     const ngaydangkyInput = document.getElementById("info_ngaydangky");
     const toggleInfoPw = document.getElementById("toggleInfoPw");
+     const diachi=document.getElementById("info_diachi");
+
+
 
     if (currentUser) {
         usernameInput.value = currentUser.username;
         document.getElementById("info_email").value = currentUser.email;
         passwordInput.value = currentUser.password;
         document.getElementById("info_ngaydangky").value = currentUser.ngaydangky;
+        diachi.value=currentUser.diachi;
     }
 
     // Show/Hide mật khẩu
@@ -353,6 +362,7 @@ function infoUser() {
             passwordInput.removeAttribute("readonly");
             emailInput.removeAttribute("readonly");
             ngaydangkyInput.removeAttribute("readonly");
+             diachi.removeAttribute("readonly");
             editBtn.innerText = "Lưu thay đổi";
         } else {
             // Lưu thay đổi
@@ -360,6 +370,8 @@ function infoUser() {
             currentUser.password = passwordInput.value;
             currentUser.email = emailInput.value;
             currentUser.ngaydangky = ngaydangkyInput.value
+            currentUser.diachi=diachi.value;
+            
             localStorage.setItem("userDatabase", JSON.stringify(users));
             localStorage.setItem("userLogin", JSON.stringify(currentUser.username));
             document.getElementById("user-login").innerText = currentUser.username;
@@ -369,6 +381,7 @@ function infoUser() {
             passwordInput.setAttribute("readonly", true);
             emailInput.setAttribute("readonly", true);
             ngaydangkyInput.setAttribute("readonly", true);
+              diachi.setAttribute("readonly", true);
             editBtn.innerText = "Sửa thông tin";
         }
     });
