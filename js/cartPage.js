@@ -148,9 +148,22 @@ function validateCart() {
  * Mở modal ĐỊA CHỈ
  */
 function validateAndShowModal() {
-  if (validateCart()) {
-    $("#addressModal").modal("show"); // Mở modal ĐỊA CHỈ
-  }
+    if (!validateCart()) return;
+
+    // Lấy user đang đăng nhập
+    let userLogin = JSON.parse(localStorage.getItem("userLogin")) || "";
+    let users = JSON.parse(localStorage.getItem("userDatabase")) || [];
+    let currentUser = users.find(u => u.username === userLogin);
+
+    // Tự động điền địa chỉ mặc định của user
+    if (currentUser) {
+        document.getElementById("shippingName").value = currentUser.username;
+        document.getElementById("shippingPhone").value = currentUser.phone || "";
+        document.getElementById("shippingAddress").value = currentUser.diachi || "";
+    }
+
+    // Mở modal địa chỉ giao hàng
+    $("#addressModal").modal("show");
 }
 
 /**
