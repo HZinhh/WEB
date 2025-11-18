@@ -84,3 +84,10 @@ button.amount:hover {
 #listLoaiSP div, #listThuongHieu div {
     height: fit-content;
 }
+
+#tenSP {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
