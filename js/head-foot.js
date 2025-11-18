@@ -298,6 +298,10 @@ function infoUser() {
                     <input type="text" id="info_ngaydangky" readonly>
                 </div>
                 <div class="info_box">
+                    <label>Số điện thoại</label>
+                    <input type="text" id="info_sdt" readonly>
+                </div>
+                <div class="info_box">
                     <label>Địa chỉ</label>
                     <input type="text" id="info_diachi" readonly>
                 </div>
@@ -327,6 +331,7 @@ function infoUser() {
     const ngaydangkyInput = document.getElementById("info_ngaydangky");
     const toggleInfoPw = document.getElementById("toggleInfoPw");
      const diachi=document.getElementById("info_diachi");
+     const phone=document.getElementById("info_sdt"); 
 
 
 
@@ -335,7 +340,8 @@ function infoUser() {
         document.getElementById("info_email").value = currentUser.email;
         passwordInput.value = currentUser.password;
         document.getElementById("info_ngaydangky").value = currentUser.ngaydangky;
-        diachi.value=currentUser.diachi;
+        diachi.value=currentUser.diachi || "";
+        phone.value=currentUser.phone || "";
     }
 
     // Show/Hide mật khẩu
@@ -362,7 +368,8 @@ function infoUser() {
             passwordInput.removeAttribute("readonly");
             emailInput.removeAttribute("readonly");
             ngaydangkyInput.removeAttribute("readonly");
-             diachi.removeAttribute("readonly");
+            diachi.removeAttribute("readonly");
+            phone.removeAttribute("readonly");
             editBtn.innerText = "Lưu thay đổi";
         } else {
             // Lưu thay đổi
@@ -371,6 +378,7 @@ function infoUser() {
             currentUser.email = emailInput.value;
             currentUser.ngaydangky = ngaydangkyInput.value
             currentUser.diachi=diachi.value;
+            currentUser.phone=phone.value;
             
             localStorage.setItem("userDatabase", JSON.stringify(users));
             localStorage.setItem("userLogin", JSON.stringify(currentUser.username));
@@ -382,6 +390,7 @@ function infoUser() {
             emailInput.setAttribute("readonly", true);
             ngaydangkyInput.setAttribute("readonly", true);
               diachi.setAttribute("readonly", true);
+              phone.setAttribute("readonly",true);
             editBtn.innerText = "Sửa thông tin";
         }
     });
