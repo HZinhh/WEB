@@ -21,6 +21,7 @@ window.onload = () => {
     setPage();
     loadThuongHieu();
     loadLoaiSanPham();
+    loadSanPham();
 }
 
 function setPage(current = page.current, numOfProducts = page.numOfProducts) {
@@ -182,8 +183,26 @@ function loadLoaiSanPham() {
                 <label>${type}</label>
             </div>`;
     });
-
 }
+
+function loadSanPham() {
+    const options = document.getElementById("locSP");
+
+    options.innerHTML = ""; // xóa dữ liệu cũ
+    productsList.forEach(sp => {
+        options.innerHTML += `<option value="${sp.name}"></option>`;
+    });
+}
+
+function locSanPham() {
+    const keyword = document.getElementById("tenSP").value.trim().toLowerCase();
+    filter.searchString = keyword;      // cập nhật filter
+    filterProduct(filter);               // lọc theo filter
+    productsList = JSON.parse(localStorage.getItem("productsList"));
+    setPage(1);                          // hiển thị từ trang 1
+}
+
+
 
 function locLoaiSanPham() {
     const check = document.querySelectorAll(".check-lsp");
