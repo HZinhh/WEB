@@ -793,9 +793,17 @@ function openForm(handle, productID = "") {
                                         <p id="remain-error" class="error">&nbsp;</p>
                                     </div>
                                 </div>
+                                
                                 <div>
-                                    <label for="product-img" class="col-form-label fw-bold">Đường dẫn tới hình ảnh:</label>
-                                    <input type="text" class="form-control" id="product-img" value="${product.img || ""}">
+                                    <label for="product-img-file" class="col-form-label fw-bold">Chọn hình ảnh:</label>
+                                    <input type="file" class="form-control" id="product-img-file" accept="image/*">
+                                    
+                                    <input type="hidden" id="product-img" value="${product.img || ""}">
+                                    
+                                    <img id="img-preview" 
+                                         src="${product.img ? '../' + product.img : ''}" 
+                                         style="width: 100px; margin-top: 10px; ${!product.img ? 'display: none;' : ''}" />
+                                         
                                     <p id="img-error" class="error">&nbsp;</p>
                                 </div>
                                 <div>
@@ -819,6 +827,23 @@ function openForm(handle, productID = "") {
     document.getElementById("productModal").innerHTML += modalDetail;
     document.getElementById("product-brand").value = product.brand;
     document.getElementById("product-type").value = product.type;
+    // update đường dẫn hình ảnh
+    const fileInput = document.getElementById("product-img-file");
+    const imgPreview = document.getElementById("img-preview");
+    const imgPathInput = document.getElementById("product-img");
+    fileInput.onchange = () => {
+        const file = fileInput.files[0];
+        if (file) {
+            const newPath = "./img/SP/" + file.name;
+            imgPathInput.value = newPath; 
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imgPreview.src = e.target.result;
+                imgPreview.style.display = "block";
+            }
+            reader.readAsDataURL(file);
+        }
+    };
     new bootstrap.Modal(modal).show();
     if (handle === "Sửa") document.getElementById("product-id").setAttribute("readonly", "true");
 }

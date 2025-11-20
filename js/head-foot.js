@@ -42,14 +42,10 @@ document.getElementsByTagName("header")[0].innerHTML += `
 `
 
 document.getElementById("nav-bar").innerHTML = `
-    <div class="col-3"></div>
-    <div class="col-6 main-nav">
-        <a href="./index.html">TRANG CHỦ</a>
-        <a href="./san-pham.html">SẢN PHẨM</a>
-        <a href="./gioi-thieu.html">GIỚI THIỆU</a>
-        <a href="./blog.html">BLOG</a>
+    <div class="col-12 d-flex justify-content-center main-nav gap-4">
+        <a href="./index.html" style="padding: 10px 20px;">TRANG CHỦ</a>
+        <a href="./san-pham.html" style="padding: 10px 20px;">SẢN PHẨM</a>
     </div>
-    <div class="col-3"></div>
 `
 
 document.getElementsByTagName("footer")[0].innerHTML = `
